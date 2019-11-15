@@ -1,0 +1,28 @@
+---
+
+- name: Remove VIP, pool, pool members and nodes
+  hosts: all
+  connection: local
+
+  tasks:
+    - name: Destroy a VIP
+      bigip_virtual_server:
+        provider: "{{ provider }}"
+        name: "{{ vip_name }}"
+        state: absent
+      delegate_to: localhost
+
+    - name: Destroy a pool
+      bigip_pool:
+        provider: "{{ provider }}"
+        name: "{{ pool_name }}"
+        state: absent
+      delegate_to: localhost
+
+    - name: Delete nodes
+      bigip_node:
+        provider: "{{ provider }}"
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ pool_members }}"
+      delegate_to: localhost

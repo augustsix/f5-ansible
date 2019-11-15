@@ -1,0 +1,36 @@
+---
+
+- name: Create a VIP, pool and pool members
+  hosts: all
+  connection: local
+
+  tasks:
+    - name: Create a pool
+      bigip_pool:
+        partition: test
+        provider: "{{ provider }}"
+        lb_method: "{{ lbmethod }}"
+        name: "{{ pool_name }}"
+      delegate_to: localhost
+
+    - name: Add members to pool
+      bigip_pool_member:
+        partition: test
+        provider: "{{ provider }}"
+        host: "{{ item.host }}"
+        name: "{{ item.name }}-{{ item.host }}"
+        pool: "{{ pool_name }}"
+        port: 80
+      loop: "{{ pool_members }}"
+      delegate_to: localhost
+
+    - name: Create a VIP
+      bigip_virtual_server:
+        partition: test
+        provider: "{{ provider }}"
+        destination: "{{ vip_ip }}"
+        name: "{{ vip_name }}"
+        pool: "{{ pool_name }}"
+        port: 80
+        snat: Automap
+      delegate_to: localhost
