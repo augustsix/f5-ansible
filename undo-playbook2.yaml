@@ -25,7 +25,7 @@
       bigip_node:
         partition: test
         provider: "{{ provider }}"
-        name: "{{ item }}"
+        name: "{{ item.name }}-{{ item.host }}"
         state: absent
       loop: "{{ pool_members }}"
       delegate_to: localhost
