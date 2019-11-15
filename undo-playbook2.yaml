@@ -7,6 +7,7 @@
   tasks:
     - name: Destroy a VIP
       bigip_virtual_server:
+        partition: test
         provider: "{{ provider }}"
         name: "{{ vip_name }}"
         state: absent
@@ -14,6 +15,7 @@
 
     - name: Destroy a pool
       bigip_pool:
+        partition: test
         provider: "{{ provider }}"
         name: "{{ pool_name }}"
         state: absent
@@ -21,6 +23,7 @@
 
     - name: Delete nodes
       bigip_node:
+        partition: test
         provider: "{{ provider }}"
         name: "{{ item }}"
         state: absent
