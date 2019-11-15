@@ -7,6 +7,7 @@
   tasks:
     - name: Create partition "test" using the default route domain
       bigip_partition:
+        provider: "{{ provider }}"
         name: test
       delegate_to: localhost
     - name: Create a pool
