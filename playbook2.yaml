@@ -5,6 +5,10 @@
   connection: local
 
   tasks:
+  - name: Create partition "test" using the default route domain
+  bigip_partition:
+    name: test
+  delegate_to: localhost
     - name: Create a pool
       bigip_pool:
         partition: test
