@@ -10,6 +10,16 @@
         provider: "{{ provider }}"
         name: test
       delegate_to: localhost
+ 
+    - name: Create HTTP Monitor
+      bigip_monitor_http:
+        state: present
+        name: my_http_monitor
+        send: {{ HealthMonitorStatus }}
+        receive: {{ HealthMonitor }}
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
+ 
     - name: Create a pool
       bigip_pool:
         partition: test
