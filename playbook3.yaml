@@ -1,18 +1,18 @@
 ---
-vars:
-  env_prefix:
-    fastlane: "FAST-"
-    staging: "STG-"
-    production: ""
-  env_suffix:
-    fastlane: "-fast"
-    staging: "-test"
-    production: ""
-  vip_ip: 10.50.6.10
-
 - name: Create a VIP, pool and pool members
   hosts: all
   connection: local
+
+  vars:
+    env_prefix:
+      fastlane: "FAST-"
+      staging: "STG-"
+      production: ""
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+    vip_ip: 10.50.6.10
 
   tasks:
     - name: Create partition "test" using the default route domain
