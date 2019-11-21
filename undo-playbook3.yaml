@@ -1,0 +1,69 @@
+---
+- name: Create a VIP, pool and pool members
+  hosts: all
+  connection: local
+
+  vars:
+    env_prefix:
+      fastlane: "FAST-"
+      staging: "STG-"
+      production: ""
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+    vip_ip: 10.50.6.10
+
+  tasks:
+    - name: Create partition "test" using the default route domain
+      bigip_partition:
+        provider: "{{ provider }}"
+        name: test
+      delegate_to: localhost
+ 
+    - name: Create HTTP Monitor
+      bigip_monitor_http:
+        provider: "{{ provider }}"
+        partition: test
+        state: present
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
+        description: "{{ ServiceName }}"
+        send: "{{ HealthMonitor }}"
+        receive: "{{ HealthMonitorStatus }}"
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
+ 
+    - name: Create a pool
+      bigip_pool:
+        partition: test
+        description: "{{ ServiceName }}"
+        provider: "{{ provider }}"
+        lb_method: round-robin
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
+
+    - name: Add members to pool
+      bigip_pool_member:
+        partition: test
+        provider: "{{ provider }}"
+        host: "{{ item.1.host }}"
+        name: "{{ item.1.name }}-{{ item.1.host }}"
+        pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+        port: 80
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
+      delegate_to: localhost
+
+    - name: Create a VIP
+      bigip_virtual_server:
+        partition: test
+        provider: "{{ provider }}"
+        destination: "{{ vip_ip | ipmath(my_idx) }}"
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
+        pool: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+        port: 80
+        snat: Automap
+      loop: "{{ MembersInfo }}"
+      loop_control:
+        index_var: my_idx
+      delegate_to: localhost
