@@ -30,7 +30,7 @@
         description: "{{ ServiceName }}"
         send: "{{ HealthMonitorStatus }}"
         receive: "{{ HealthMonitor }}"
-      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes')}}"
       delegate_to: localhost
  
     - name: Create a pool
