@@ -1,3 +1,23 @@
+    
+---
+- name: Create a VIP, pool and pool members
+  hosts: all
+  gather_facts: False
+  connection: local
+
+  vars:
+    env_prefix:
+      fastlane: "FAST-"
+      staging: "STG-"
+      production: ""
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+    vip_ip: 10.50.6.10
+
+  tasks:
+ 
     - name: Add members to pool
       bigip_pool_member:
         partition: test
@@ -6,5 +26,6 @@
         name: "{{ item.1.name }}-{{ item.1.host }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
+        state: {{ item.1.state }}
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
