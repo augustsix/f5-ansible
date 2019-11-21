@@ -47,11 +47,11 @@
       bigip_pool_member:
         partition: test
         provider: "{{ provider }}"
-        host: "{{ item.1.name }}-{{ item.1.ip }}"
-        name: "{{ item.1.ip }}"
+        host: "{{ item.1.name }}-{{ item.1.host }}"
+        name: "{{ item.1.ihost }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
-      loop: "{{ MembersInfo|subelements('MemberNodes')|list }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
 
     - name: Create a VIP
