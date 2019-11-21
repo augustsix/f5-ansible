@@ -51,7 +51,7 @@
         name: "{{ item.1.ip }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
-      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes')|list }}"
       delegate_to: localhost
 
     - name: Create a VIP
