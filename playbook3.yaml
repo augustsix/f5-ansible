@@ -38,7 +38,7 @@ vars:
         partition: test
         description
         provider: "{{ provider }}"
-        lb_method: "{{ lbmethod }}"
+        lb_method: round-robin
         name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool
       loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
