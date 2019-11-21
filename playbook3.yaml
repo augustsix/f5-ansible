@@ -1,6 +1,7 @@
 ---
 - name: Create a VIP, pool and pool members
   hosts: all
+  gather_facts: False
   connection: local
 
   vars:
