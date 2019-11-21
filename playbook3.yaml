@@ -59,11 +59,11 @@
         partition: test
         provider: "{{ provider }}"
         destination: "{{ vip_ip | ipmath(my_idx) }}"
-        name: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
-        pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
+        pool: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
         snat: Automap
-      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
+      loop: "{{ MembersInfo }}"
       loop_control:
         index_var: my_idx
       delegate_to: localhost
