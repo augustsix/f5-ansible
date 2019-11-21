@@ -28,8 +28,8 @@
         state: present
         name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_mon"
         description: "{{ ServiceName }}"
-        send: "{{ HealthMonitorStatus }}"
-        receive: "{{ HealthMonitor }}"
+        send: "{{ HealthMonitor }}"
+        receive: "{{ HealthMonitorStatus }}"
       loop: "{{ MembersInfo|subelements('MemberNodes')}}"
       delegate_to: localhost
  
