@@ -30,7 +30,7 @@
         state: present
         name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
         description: "{{ ServiceName }}"
-        send: "GET {{ HealthMonitor }} HTTP/1.1\r\nHost: {{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon\r\n\r\n"
+        send: "GET {{ HealthMonitor }} HTTP/1.1\\r\\nHost: {{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon\\r\\n\\r\\n"
         receive: "{{ HealthMonitorStatus }}"
       loop: "{{ MembersInfo }}"
       delegate_to: localhost
