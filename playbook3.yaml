@@ -26,11 +26,11 @@
         provider: "{{ provider }}"
         partition: test
         state: present
-        name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_mon"
+        name: "{{ env_prefix[item.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
         description: "{{ ServiceName }}"
         send: "{{ HealthMonitor }}"
         receive: "{{ HealthMonitorStatus }}"
-      loop: "{{ MembersInfo|subelements('MemberNodes')}}"
+      loop: "{{ MembersInfo }}"
       delegate_to: localhost
  
     - name: Create a pool
@@ -40,7 +40,7 @@
         provider: "{{ provider }}"
         lb_method: round-robin
         name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
-      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
 
     - name: Add members to pool
@@ -51,7 +51,7 @@
         name: "{{ item.1 }}-{{ lookup('dig' {{item.1}}) }}"
         pool: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
-      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
 
     - name: Create a VIP
@@ -63,7 +63,7 @@
         pool: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
         snat: Automap
-      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       loop_control:
         index_var: my_idx
       delegate_to: localhost
