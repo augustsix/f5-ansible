@@ -48,7 +48,7 @@
         partition: test
         provider: "{{ provider }}"
         host: "{{ item.1.name }}-{{ item.1.host }}"
-        name: "{{ item.1.ihost }}"
+        name: "{{ item.1.host }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
