@@ -39,16 +39,16 @@
         description: "{{ ServiceName }}"
         provider: "{{ provider }}"
         lb_method: round-robin
-        name: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
-      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+      loop: "{{ MembersInfo }}"
       delegate_to: localhost
 
     - name: Add members to pool
       bigip_pool_member:
         partition: test
         provider: "{{ provider }}"
-        host: "{{ item.1 }}"
-        name: "{{ item.1 }}"
+        host: "{{ item.1.name }}-{{ item.1.ip }}"
+        name: "{{ item.1.ip }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
