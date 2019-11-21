@@ -26,10 +26,10 @@
         provider: "{{ provider }}"
         partition: test
         state: present
-        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_mon
-        description: {{ ServiceName }}
-        send: {{ HealthMonitorStatus }}
-        receive: {{ HealthMonitor }}
+        name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_mon"
+        description: "{{ ServiceName }}"
+        send: "{{ HealthMonitorStatus }}"
+        receive: "{{ HealthMonitor }}"
       loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
  
@@ -39,7 +39,7 @@
         description
         provider: "{{ provider }}"
         lb_method: round-robin
-        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool
+        name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
       loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
 
@@ -49,7 +49,7 @@
         provider: "{{ provider }}"
         host: "{{ item.1 }}"
         name: "{{ item.1 }}-{{ lookup('dig' {{item.1}}) }}"
-        pool: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool
+        pool: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
       loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
@@ -59,8 +59,8 @@
         partition: test
         provider: "{{ provider }}"
         destination: "{{ vip_ip | ipmath(my_idx) }}"
-        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_vs
-        pool: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool
+        name: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
+        pool: "{{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
         snat: Automap
       loop: "{{ MembersInfo|product(MemberNodes)|list }}"
