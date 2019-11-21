@@ -26,6 +26,6 @@
         name: "{{ item.1.name }}-{{ item.1.host }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
-        state: {{ item.1.state }}
+        state: "{{ item.1.state }}"
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
