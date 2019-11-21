@@ -1,4 +1,14 @@
 ---
+vars:
+  env_prefix:
+    fastlane: "FAST-"
+    staging: "STG-"
+    production: ""
+  env_suffix:
+    fastlane: "-fast"
+    staging: "-test"
+    production: ""
+    
 
 - name: Create a VIP, pool and pool members
   hosts: all
@@ -13,30 +23,35 @@
  
     - name: Create HTTP Monitor
       bigip_monitor_http:
+        provider: "{{ provider }}"
+        partition: test
         state: present
-        name: my_http_monitor
+        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.coyote.com_mon
+        description: {{ ServiceName }}
         send: {{ HealthMonitorStatus }}
         receive: {{ HealthMonitor }}
-      loop: "{{ MembersInfo }}"
+      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
  
     - name: Create a pool
       bigip_pool:
         partition: test
+        description
         provider: "{{ provider }}"
         lb_method: "{{ lbmethod }}"
-        name: "{{ pool_name }}"
+        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.coyote.com_{{ VIPPort }}_pool
+      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
 
     - name: Add members to pool
       bigip_pool_member:
         partition: test
         provider: "{{ provider }}"
-        host: "{{ item.host }}"
-        name: "{{ item.name }}-{{ item.host }}"
-        pool: "{{ pool_name }}"
+        host: "{{ item.1 }}"
+        name: "{{ item.1 }}-{{ lookup('dig' {{item.1}}) }}"
+        pool: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.coyote.com_{{ VIPPort }}_pool
         port: 80
-      loop: "{{ pool_members }}"
+      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
 
     - name: Create a VIP
@@ -44,8 +59,9 @@
         partition: test
         provider: "{{ provider }}"
         destination: "{{ vip_ip }}"
-        name: "{{ vip_name }}"
-        pool: "{{ pool_name }}"
+        name: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.coyote.com_{{ VIPPort }}_vs
+        pool: {{ env_prefix[item.0.Environment] }}-{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.coyote.com_{{ VIPPort }}_pool
         port: 80
         snat: Automap
+      loop: "{{ MembersInfo|product(MemberNodes)|list }}"
       delegate_to: localhost
