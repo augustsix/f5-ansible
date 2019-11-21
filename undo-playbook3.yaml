@@ -1,5 +1,5 @@
 ---
-- name: Create a VIP, pool and pool members
+- name: Destroy VIP, pool and pool members
   hosts: all
   gather_facts: False
   connection: local
@@ -16,7 +16,7 @@
     vip_ip: 10.50.6.10
 
   tasks:
-    - name: Create a VIP
+    - name: Destroy a VIP
       bigip_virtual_server:
         partition: test
         state: absent
@@ -25,7 +25,7 @@
       loop: "{{ MembersInfo }}"
       delegate_to: localhost
       
-    - name: Create a pool
+    - name: Destroy a pool
       bigip_pool:
         partition: test
         state: absent
@@ -34,7 +34,7 @@
       loop: "{{ MembersInfo }}"
       delegate_to: localhost
 
-    - name: Add members to pool
+    - name: Destroy a node
       bigip_node:
         provider: "{{ provider }}"
         partition: test
@@ -43,7 +43,7 @@
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
 
-    - name: Create HTTP Monitor
+    - name: Destroy an HTTP Monitor
       bigip_monitor_http:
         provider: "{{ provider }}"
         partition: test
