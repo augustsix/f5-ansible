@@ -17,13 +17,13 @@
 
   tasks:
     - name: Create a VIP
-     bigip_virtual_server:
-       partition: test
-       state: absent
-       provider: "{{ provider }}"
-       name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
-     loop: "{{ MembersInfo }}"
-     delegate_to: localhost
+      bigip_virtual_server:
+        partition: test
+        state: absent
+        provider: "{{ provider }}"
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
       
     - name: Create a pool
       bigip_pool:
