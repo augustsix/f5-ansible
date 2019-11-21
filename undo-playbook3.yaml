@@ -36,12 +36,12 @@
 
     - name: Add members to pool
       bigip_node:
+        provider: "{{ provider }}"
         partition: test
         state: absent
         name: "{{ item.1.name }}-{{ item.1.host }}"
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
       delegate_to: localhost
-
 
     - name: Create HTTP Monitor
       bigip_monitor_http:
