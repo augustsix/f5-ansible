@@ -1,21 +1,8 @@
 ---
-- name: Create a VIP, pool and pool members
-  hosts: all
+- name: 
+  hosts: localhost
   gather_facts: False
   connection: local
-
-  vars:
-    env_prefix:
-      fastlane: "FAST-"
-      staging: "STG-"
-      production: ""
-    env_suffix:
-      fastlane: "-fast"
-      staging: "-test"
-      production: ""
-    vip_ip: 10.50.6.10
-    partition: test
-
   tasks:
   
     - name: Gathering ipam auth token
@@ -48,7 +35,26 @@
         body:
           hostname: "{{ hostname }}"
           description: " {{ ipam.description }}"
- 
+
+- name: Create a VIP, pool and pool members
+  hosts: all
+  gather_facts: False
+  connection: local
+
+  vars:
+    env_prefix:
+      fastlane: "FAST-"
+      staging: "STG-"
+      production: ""
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+    vip_ip: 10.50.6.10
+    partition: test
+
+  tasks:
+  
     - name: Create partition "test" using the default route domain
       bigip_partition:
         provider: "{{ provider }}"
