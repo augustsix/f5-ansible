@@ -18,16 +18,16 @@
 
   tasks:
   
-     - name: Gathering ipam auth token
-       uri:
-         validate_certs: false
-         url: "{{ ipam.token_request }}"
-         method: POST
-         user: "{{ ipam.api_user }}"
-         password: "{{ ipam.api_pass | trim }}"
-         force_basic_auth: yes
-       register: output
-    
+    - name: Gathering ipam auth token
+      uri:
+        validate_certs: false
+        url: "{{ ipam.token_request }}"
+        method: POST
+        user: "{{ ipam.api_user }}"
+        password: "{{ ipam.api_pass | trim }}"
+        force_basic_auth: yes
+      register: output
+       
     - name: checking subnet for next available ip address
       uri:
         validate_certs: false
