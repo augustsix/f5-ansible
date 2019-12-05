@@ -13,12 +13,14 @@
         user: "{{ ipam.api_user }}"
         password: "{{ ipam.api_pass | trim }}"
         force_basic_auth: yes
+        follow_redirects: all
       register: output
        
     - name: checking subnet for next available ip address
       uri:
         validate_certs: false
         url: "{{ ipam.available_ip }}{{ ipam.subnet_id | int }}"
+        follow_redirects: all
         headers: 
           token: "{{ output.json.data.token }}"
       register: ip_address
@@ -28,6 +30,7 @@
         validate_certs: false
         url: "{{ ipam.available_ip }}{{ ipam.subnet_id | int }}"
         method: POST
+        follow_redirects: all
         headers: 
           token: "{{ output.json.data.token }}"
           Content-Type: application/json
