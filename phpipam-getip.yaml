@@ -13,8 +13,6 @@
         user: "{{ ipam.api_user }}"
         password: "{{ ipam.api_pass | trim }}"
         force_basic_auth: yes
-        headers:
-          Host: "ipam.coyote.com"
       register: output
        
     - name: checking subnet for next available ip address
@@ -23,7 +21,6 @@
         url: "{{ ipam.available_ip }}{{ ipam.subnet_id | int }}"
         headers: 
           token: "{{ output.json.data.token }}"
-          Host: "ipam.cpypte.com"
       register: ip_address
     
     - name: reserve ip address
@@ -34,7 +31,6 @@
         headers: 
           token: "{{ output.json.data.token }}"
           Content-Type: application/json
-          Host: "ipam.coyote.com"
         body_format: json
         status_code: 201
         body:
