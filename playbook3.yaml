@@ -50,7 +50,7 @@
           token: "{{ output.json.data.token }}"
           Content-Type: application/json
         body_format: json
-        status_code: 201
+        status_code: 200
         body:
           hostname: "{{ DNSPrefix }}.ansible.test.com"
           description: " {{ ipam.description }}"
