@@ -40,6 +40,21 @@
           hostname: "{{ DNSPrefix }}.ansible.test.com"
           description: " {{ ipam.description }}"
 
+    - name: remove ip address
+      uri:
+        validate_certs: false
+        url: "{{ ipam.available_ip }}/{{ip_address}}/{{ ipam.subnet_id | int }}/"
+        method: DELETE
+        follow_redirects: all
+        headers: 
+          token: "{{ output.json.data.token }}"
+          Content-Type: application/json
+        body_format: json
+        status_code: 201
+        body:
+          hostname: "{{ DNSPrefix }}.ansible.test.com"
+          description: " {{ ipam.description }}"
+
 - name: Create a VIP, pool and pool members
   hosts: all
   gather_facts: False
