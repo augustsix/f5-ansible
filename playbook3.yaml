@@ -43,7 +43,7 @@
     - name: remove ip address
       uri:
         validate_certs: false
-        url: "{{ ipam.register_ip }}/{{ip_address.json.data}}/{{ ipam.subnet_id | int }}/"
+        url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ ipam.subnet_id | int }}/"
         method: DELETE
         follow_redirects: all
         headers: 
