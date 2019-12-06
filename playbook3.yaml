@@ -4,7 +4,10 @@
   gather_facts: False
   connection: local
   tasks:
-  
+
+    - name: Simple A record (IPV4 address) lookup for example.com
+      debug: msg="{{ lookup('dig', 'www.coyote.com')}}"
+
     - name: Gathering ipam auth token
       uri:
         validate_certs: false
