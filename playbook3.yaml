@@ -9,6 +9,10 @@
       fastlane: 1007
       staging: 1007
       production: 1007
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
   
   tasks:
 
