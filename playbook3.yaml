@@ -29,7 +29,7 @@
     - name: checking subnet for next available ip address
       uri:
         validate_certs: false
-        url: "{{ ipam.available_ip }}{{ ipam.subnet_id | int }}/"
+        url: "{{ ipam.available_ip }}{{ subnet_id[item.Environment] | int }}/"
         follow_redirects: all
         headers: 
           token: "{{ output.json.data.token }}"
@@ -47,7 +47,7 @@
         body_format: json
         status_code: 201
         body:
-          hostname: "{{ DNSPrefix }}.ansible.test.com"
+          hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
           description: " {{ ipam.description }}"
       loop: "{{ MembersInfo }}"
 
