@@ -63,7 +63,7 @@
         body_format: json
         status_code: 200
         body:
-          hostname: "{{ DNSPrefix }}.ansible.test.com"
+          hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
           description: " {{ ipam.description }}"
       loop: "{{ MembersInfo }}"
 
