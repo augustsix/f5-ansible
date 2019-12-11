@@ -51,21 +51,21 @@
           description: " {{ ipam.description }}"
       loop: "{{ MembersInfo }}"
 
-    - name: remove ip address
-      uri:
-        validate_certs: false
-        url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ subnet_id[item.Environment] | int }}/"
-        method: DELETE
-        follow_redirects: all
-        headers: 
-          token: "{{ output.json.data.token }}"
-          Content-Type: application/json
-        body_format: json
-        status_code: 200
-        body:
-          hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
-          description: " {{ ipam.description }}"
-      loop: "{{ MembersInfo }}"
+ #   - name: remove ip address
+ #     uri:
+ #       validate_certs: false
+ #       url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ subnet_id[item.Environment] | int }}/"
+ #       method: DELETE
+ #       follow_redirects: all
+ #       headers: 
+ #         token: "{{ output.json.data.token }}"
+ #         Content-Type: application/json
+ #       body_format: json
+ #       status_code: 200
+ #       body:
+ #         hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
+ #         description: " {{ ipam.description }}"
+ #     loop: "{{ MembersInfo }}"
 
 - name: Create a VIP, pool and pool members
   hosts: all
