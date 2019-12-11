@@ -56,6 +56,11 @@
           hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
           description: " {{ ipam.description }}"
       loop: "{{ MembersInfo }}"
+      register: ip_reservation
+      
+    - name: echo output of ip_reservation
+      debug:
+        var: ip_reservation
 
  #   - name: remove ip address
  #     uri:
