@@ -3,6 +3,13 @@
   hosts: localhost
   gather_facts: False
   connection: local
+  
+  vars:
+    subnet_id:
+      fastlane: 1007
+      staging: 1007
+      production: 1007
+  
   tasks:
 
     - name: Simple A record (IPV4 address) lookup for example.com
@@ -31,7 +38,7 @@
     - name: reserve ip address
       uri:
         validate_certs: false
-        url: "{{ ipam.available_ip }}{{ ipam.subnet_id | int }}/"
+        url: "{{ ipam.available_ip }}{{ subnet_id[item.Environment] | int }}/"
         method: POST
         follow_redirects: all
         headers: 
@@ -42,11 +49,12 @@
         body:
           hostname: "{{ DNSPrefix }}.ansible.test.com"
           description: " {{ ipam.description }}"
+      loop: "{{ MembersInfo }}"
 
     - name: remove ip address
       uri:
         validate_certs: false
-        url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ ipam.subnet_id | int }}/"
+        url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ subnet_id[item.Environment] | int }}/"
         method: DELETE
         follow_redirects: all
         headers: 
@@ -57,6 +65,7 @@
         body:
           hostname: "{{ DNSPrefix }}.ansible.test.com"
           description: " {{ ipam.description }}"
+      loop: "{{ MembersInfo }}"
 
 - name: Create a VIP, pool and pool members
   hosts: all
