@@ -130,7 +130,7 @@
       bigip_pool_member:
         partition: "{{ partition }}"
         provider: "{{ provider }}"
-        host: "{{ item.1.host }}"
+        host: {{ item.1.host }}"
         name: "{{ item.1.name }}-{{ item.1.host }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
