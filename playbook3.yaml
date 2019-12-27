@@ -54,7 +54,7 @@
         status_code: 201
         body:
           hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
-          description: " {{ ipam.description }}"
+          description: "{{ ipam.description }}"
       loop: "{{ MembersInfo }}"
       register: ip_reservation
       
@@ -75,7 +75,7 @@
  #       status_code: 200
  #       body:
  #         hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
- #         description: " {{ ipam.description }}"
+ #         description: "{{ ipam.description }}"
  #     loop: "{{ MembersInfo }}"
 
 - name: Create a VIP, pool and pool members
@@ -130,7 +130,7 @@
       bigip_pool_member:
         partition: "{{ partition }}"
         provider: "{{ provider }}"
-        host: {{ item.1.host }}"
+        host: "{{ item.1.host }}"
         name: "{{ item.1.name }}-{{ item.1.host }}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
