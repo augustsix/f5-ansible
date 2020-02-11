@@ -131,8 +131,8 @@
         partition: "{{ partition }}"
         provider: "{{ provider }}"
         #host: "{{ item.1.host }}"
-        host: "{{ lookup('dig', {{item.1.name}}.coyotelogistics.local)}}"
-        name: "{{ item.1.name }}-{{ lookup('dig', {{item.1.name}}.coyotelogistics.local)}}"
+        host: "{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
+        name: "{{ item.1.name }}-{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
         pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
         port: 80
       loop: "{{ MembersInfo|subelements('MemberNodes') }}"
