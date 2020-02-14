@@ -1,0 +1,153 @@
+---
+- name: 
+  hosts: localhost
+  gather_facts: False
+  connection: local
+  
+  vars:
+    subnet_id:
+      fastlane: 1007
+      staging: 1007
+      production: 1007
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+  
+  tasks:
+
+    - name: Simple A record (IPV4 address) lookup for example.com
+      debug: msg="{{ lookup('dig', 'www.coyote.com')}}"
+
+    - name: Gathering ipam auth token
+      uri:
+        validate_certs: false
+        url: "{{ ipam.token_request }}"
+        method: POST
+        user: "{{ ipam.api_user }}"
+        password: "{{ ipam.api_pass | trim }}"
+        force_basic_auth: yes
+        follow_redirects: all
+      register: output
+       
+    - name: checking subnet for next available ip address
+      uri:
+        validate_certs: false
+        url: "{{ ipam.available_ip }}{{ subnet_id[item.Environment] | int }}/"
+        follow_redirects: all
+        headers: 
+          token: "{{ output.json.data.token }}"
+      loop: "{{ MembersInfo }}"
+      register: ip_address
+      
+    
+    - name: reserve ip address
+      uri:
+        validate_certs: false
+        url: "{{ ipam.available_ip }}{{ subnet_id[item.Environment] | int }}/"
+        method: POST
+        follow_redirects: all
+        headers: 
+          token: "{{ output.json.data.token }}"
+          Content-Type: application/json
+        body_format: json
+        status_code: 201
+        body:
+          hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
+          description: "{{ ipam.description }}"
+      loop: "{{ MembersInfo }}"
+      register: ip_reservation
+      
+    - name: echo output of ip_reservation
+      debug:
+        var: ip_reservation
+
+ #   - name: remove ip address
+ #     uri:
+ #       validate_certs: false
+ #       url: "{{ ipam.register_ip }}{{ip_address.json.data}}/{{ subnet_id[item.Environment] | int }}/"
+ #       method: DELETE
+ #       follow_redirects: all
+ #       headers: 
+ #         token: "{{ output.json.data.token }}"
+ #         Content-Type: application/json
+ #       body_format: json
+ #       status_code: 200
+ #       body:
+ #         hostname: "{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.ansible.test.com"
+ #         description: "{{ ipam.description }}"
+ #     loop: "{{ MembersInfo }}"
+
+- name: Create a VIP, pool and pool members
+  hosts: all
+  gather_facts: False
+  connection: local
+
+  vars:
+    env_prefix:
+      fastlane: "FAST-"
+      staging: "STG-"
+      production: ""
+    env_suffix:
+      fastlane: "-fast"
+      staging: "-test"
+      production: ""
+    vip_ip: 10.50.6.10
+    partition: test
+
+  tasks:
+  
+    - name: Create partition "test" using the default route domain
+      bigip_partition:
+        provider: "{{ provider }}"
+        name: "{{ partition }}"
+      delegate_to: localhost
+ 
+    - name: Create HTTP Monitor
+      bigip_monitor_http:
+        provider: "{{ provider }}"
+        partition: "{{ partition }}"
+        state: present
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
+        description: "{{ ServiceName }}"
+        send: "GET {{ HealthMonitor }} HTTP/1.1\\r\\nHost: {{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com\\r\\n\\r\\n"
+        receive: "{{ HealthMonitorStatus }}"
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
+ 
+    - name: Create a pool
+      bigip_pool:
+        partition: "{{ partition }}"
+        description: "{{ ServiceName }}"
+        monitors: "/{{ partition }}/{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
+        provider: "{{ provider }}"
+        lb_method: round-robin
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+      loop: "{{ MembersInfo }}"
+      delegate_to: localhost
+
+    - name: Add members to pool
+      bigip_pool_member:
+        partition: "{{ partition }}"
+        provider: "{{ provider }}"
+        #host: "{{ item.1.host }}"
+        host: "{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
+        name: "{{ item.1.name }}-{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
+        pool: "{{ env_prefix[item.0.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.0.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+        port: 80
+      loop: "{{ MembersInfo|subelements('MemberNodes') }}"
+      delegate_to: localhost
+
+    - name: Create a VIP
+      bigip_virtual_server:
+        partition: "{{ partition }}"
+        provider: "{{ provider }}"
+        destination: "{{ vip_ip | ipmath(my_idx) }}"
+        name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
+        pool: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
+        port: 80
+        snat: Automap
+      loop: "{{ MembersInfo }}"
+      loop_control:
+        index_var: my_idx
+      delegate_to: localhost
