@@ -99,7 +99,7 @@
   
     - name: Create partition "test" using the default route domain
       bigip_partition:
-        provider: "{{hostvars[item.Environment]}}"
+        provider: "{{hostvars['10.3.5.81'][item.Environment]}}"
         name: "{{ partition }}"
       loop: "{{ MembersInfo }}"
       delegate_to: localhost
