@@ -99,14 +99,14 @@
   
     - name: Create partition "test" using the default route domain
       bigip_partition:
-        provider: "{{item.Environment}}['provider']"
+        provider: {{item.Environment}}
         name: "{{ partition }}"
       loop: "{{ MembersInfo }}"
       delegate_to: localhost
  
     - name: Create HTTP Monitor
       bigip_monitor_http:
-        provider: "{{item.Environment}}['provider']"
+        provider: {{item.Environment}}
         partition: "{{ partition }}"
         state: present
         name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
@@ -121,7 +121,7 @@
         partition: "{{ partition }}"
         description: "{{ ServiceName }}"
         monitors: "/{{ partition }}/{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_mon"
-        provider: "{{item.Environment}}['provider']"
+        provider: {{item.Environment}}
         lb_method: round-robin
         name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
       loop: "{{ MembersInfo }}"
@@ -130,7 +130,7 @@
     - name: Add members to pool
       bigip_pool_member:
         partition: "{{ partition }}"
-        provider: "{{item.Environment}}['provider']"
+        provider: {{item.Environment}}
         #host: "{{ item.1.host }}"
         host: "{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
         name: "{{ item.1.name }}-{{ lookup('dig', '{{item.1.name}}.coyotelogistics.local')}}"
@@ -142,7 +142,7 @@
     - name: Create a VIP
       bigip_virtual_server:
         partition: "{{ partition }}"
-        provider: "{{item.Environment}}['provider']"
+        provider: {{item.Environment}}
         destination: "{{ vip_ip | ipmath(my_idx) }}"
         name: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_vs"
         pool: "{{ env_prefix[item.Environment] }}{{ DNSPrefix }}{{ env_suffix[item.Environment] }}.somedomain.com_{{ VIPPort }}_pool"
