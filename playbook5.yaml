@@ -101,6 +101,7 @@
       bigip_partition:
         provider: "{{item.Environment}}-{{ provider }}"
         name: "{{ partition }}"
+      loop: "{{ MembersInfo }}"
       delegate_to: localhost
  
     - name: Create HTTP Monitor
